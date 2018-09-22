@@ -11,7 +11,16 @@ class UserController extends Controller
     public function index(Request $request)
     {
         $page = $request->get("page") ?: 1;
-        $users = User::all()->forPage((int)$page,3);
+        $users = User::all()
+                    ->forPage((int)$page,3);
+        $users = $users->map(function($item){
+              return array(
+                  "id" => $item->id,
+                  "first_name" => $item->nombre,
+                  "last_name" => $item->apellidopat." ".$item->apellidomat,
+                  "avatar" => $item->avatar
+              );
+        });
         return response()->json([
             "page" => $page,
             "per_page" => 3,
@@ -28,7 +37,7 @@ class UserController extends Controller
                 "id" => $user->id,
                 "first_name" => $user->nombre,
                 "last_name" => $user->apellidopat." ".$user->apellidomat,
-                "avatar" => null
+                "avatar" => $user->avatar
             ])
         ]);
     }
@@ -48,10 +57,10 @@ class UserController extends Controller
             "apellidopat" => $user->apellidopat,
             "apellidomat" => $user->apellidomat,
             "email" => $user->email,
-            "fchnac" => $user->fechnac,
-            "fchingreso" => $user->fchingreso,
+            "fchnac" => date('d/m/Y', strtotime($user->fchnac)),
+            "fchingreso" => date('d/m/Y', strtotime($user->fchingreso)),
             "id" => $user->id,
-            "createdAt"=> $user->created_at
+            "createdAt"=> $user->created_at->toDateTimeString()
         ]);
     }
 
@@ -70,10 +79,29 @@ class UserController extends Controller
             "apellidopat" => $user->apellidopat,
             "apellidomat" => $user->apellidomat,
             "email" => $user->email,
-            "fchnac" => $user->fechnac,
-            "fchingreso" => $user->fchingreso,
+            "fchnac" => date('d/m/Y', strtotime($user->fchnac)),
+            "fchingreso" => date('d/m/Y', strtotime($user->fchingreso)),
             "id" => $user->id,
-            "createdAt"=> $user->created_at
+            "createdAt"=> $user->created_at->toDateTimeString()
+        ]);
+    }
+
+    public function delete($id)
+    {
+        $user = User::find($id);
+        $result = '';
+        if($user==null)
+            $result= 'No user found';
+        else
+        {
+            $user->delete();
+            $result= 'User deleted';
+        }
+
+        return response()->json([
+            "data" => array([
+                "Result" => $result,
+            ])
         ]);
     }
 }

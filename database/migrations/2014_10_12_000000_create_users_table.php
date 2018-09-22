@@ -18,10 +18,11 @@ class CreateUsersTable extends Migration
             $table->string('nombre');
             $table->string('apellidopat');
             $table->string('apellidomat');
-            $table->string('email')->unique();
+            $table->string('email');
             $table->string('password');
-            $table->string('fchnac');
-            $table->string('fchingreso');
+            $table->dateTime('fchnac');
+            $table->dateTime('fchingreso');
+            $table->string('avatar')->default('https://s3.amazonaws.com/uifaces/faces/twitter/calebogden/128.jpg');
             $table->rememberToken();
             $table->timestamps();
         });

@@ -22,3 +22,5 @@ Route::get('/api/users/{id}','UserController@find');
 Route::post('/api/users','UserController@create');
 
 Route::put('/api/users/{id}','UserController@update');
+
+Route::delete('/api/users/{id}','UserController@delete');
