@@ -15,13 +15,13 @@ class CreateUsersTable extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('nombre');
-            $table->string('apellidopat');
-            $table->string('apellidomat');
-            $table->string('email');
-            $table->string('password');
-            $table->dateTime('fchnac');
-            $table->dateTime('fchingreso');
+            $table->string('nombre')->nullable();
+            $table->string('apellidopat')->nullable();
+            $table->string('apellidomat')->nullable();
+            $table->string('email')->nullable();
+            $table->string('password')->nullable();
+            $table->dateTime('fchnac')->nullable();
+            $table->dateTime('fchingreso')->nullable();
             $table->string('avatar')->default('https://s3.amazonaws.com/uifaces/faces/twitter/calebogden/128.jpg');
             $table->rememberToken();
             $table->timestamps();

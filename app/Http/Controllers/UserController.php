@@ -14,17 +14,20 @@ class UserController extends Controller
         $users = User::all()
                     ->forPage((int)$page,3);
         $users = $users->map(function($item){
-              return array(
-                  "id" => $item->id,
-                  "first_name" => $item->nombre,
-                  "last_name" => $item->apellidopat." ".$item->apellidomat,
-                  "avatar" => $item->avatar
-              );
+            return array(
+                "id" => $item->id,
+                "first_name" => $item->nombre,
+                "last_name" => $item->apellidopat." ".$item->apellidomat,
+                "avatar" => $item->avatar
+            );
         });
+        $total = User::all()->count();
+
         return response()->json([
             "page" => $page,
             "per_page" => 3,
-            "total_pages" => ceil(User::all()->count()/3),
+            "total" => $total,
+            "total_pages" => ceil($total/3),
             "data" => $users
         ]);
     }
@@ -32,13 +35,14 @@ class UserController extends Controller
     public function find($id)
     {
         $user = User::find($id);
+        if($user == null)return response()->json(["data" => []],404);
         return response()->json([
-            "data" => array([
+            "data" => array(
                 "id" => $user->id,
                 "first_name" => $user->nombre,
                 "last_name" => $user->apellidopat." ".$user->apellidomat,
                 "avatar" => $user->avatar
-            ])
+            )
         ]);
     }
     public function create(Request $request)
@@ -50,7 +54,6 @@ class UserController extends Controller
         $user->email = $request->get('email');
         $user->fchnac = $request->get('fchnac');
         $user->fchingreso = $request->get('fchingreso');
-        $user->password = 'w3ewewwewewewe';
         $user->save();
         return response()->json([
             "nombre"=> $user->nombre,
@@ -61,19 +64,15 @@ class UserController extends Controller
             "fchingreso" => date('d/m/Y', strtotime($user->fchingreso)),
             "id" => $user->id,
             "createdAt"=> $user->created_at->toDateTimeString()
-        ]);
+        ],201);
     }
 
     public function update($id,Request $request)
     {
         $user = User::find($id);
-        $user->nombre = $request->get('nombre');
-        $user->apellidopat = $request->get('apellidopat');
-        $user->apellidomat = $request->get('apellidomat');
-        $user->email = $request->get('email');
-        $user->fchnac = $request->get('fchnac');
-        $user->fchingreso = $request->get('fchingreso');
-        $user->save();
+        if($user == null)return response()->json(["Result" => "User not found"],404);
+        $params = $request->all();
+        $user->update($params);
         return response()->json([
             "nombre"=> $user->nombre,
             "apellidopat" => $user->apellidopat,
@@ -83,25 +82,27 @@ class UserController extends Controller
             "fchingreso" => date('d/m/Y', strtotime($user->fchingreso)),
             "id" => $user->id,
             "createdAt"=> $user->created_at->toDateTimeString()
-        ]);
+        ],200);
     }
 
     public function delete($id)
     {
         $user = User::find($id);
-        $result = '';
         if($user==null)
-            $result= 'No user found';
+            return response()->json(
+                array(
+                    "Result" => 'User not found',
+                )
+            ,404);
         else
         {
             $user->delete();
-            $result= 'User deleted';
+            return response()->json(
+                array(
+                    "Result" => 'User deleted',
+                )
+            ,200);
         }
 
-        return response()->json([
-            "data" => array([
-                "Result" => $result,
-            ])
-        ]);
     }
 }
